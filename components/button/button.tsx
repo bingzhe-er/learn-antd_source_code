@@ -41,31 +41,39 @@ function isUnBorderedButtonType(type: ButtonType | undefined) {
 function isReactFragment(node: React.ReactNode) {
   return React.isValidElement(node) && node.type === React.Fragment;
 }
-// 🌟插入空格
+// 🌟插入空格, 接受两个参数, child为React节点或字符串或数字, needInserted为布尔值
 // Insert one space between two chinese characters automatically.
 function insertSpace(child: React.ReactElement | string | number, needInserted: boolean) {
   // Check the child if is undefined or null.
+  // 🌟如果child为null或undefined
   if (child === null || child === undefined) {
+    // 🌟返回
     return;
   }
+  // 🌟声明SPACE, 值为根据needInserted如果传, 为携带空格的字符串, 否则为空字符串
   const SPACE = needInserted ? ' ' : '';
   // strictNullChecks oops.
+  // 🌟child不为string类型并且child不等于number类型并且child的type属性为字符串并且child的props的children是否包含2个中文
   if (
     typeof child !== 'string' &&
     typeof child !== 'number' &&
     isString(child.type) &&
     isTwoCNChar(child.props.children)
   ) {
+    // 🌟返回调用cloneElement函数, 传入child, 传入对象包含children属性, 值为child的props的children分割后合并, 是否加入空格取决于上面的needInsert参数
     return cloneElement(child, {
       children: child.props.children.split('').join(SPACE),
     });
   }
+  // 🌟如果child的类型为字符串, 返回字符串, 根据是否包含两个中文字符决定是否加入空格
   if (typeof child === 'string') {
     return isTwoCNChar(child) ? <span>{child.split('').join(SPACE)}</span> : <span>{child}</span>;
   }
+  // 🌟如果child是reactfragment, 那么就用span将其包裹起来返回
   if (isReactFragment(child)) {
     return <span>{child}</span>;
   }
+  // 🌟数字类型直接返回child
   return child;
 }
 
